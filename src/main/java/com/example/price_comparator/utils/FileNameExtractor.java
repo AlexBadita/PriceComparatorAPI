@@ -1,7 +1,5 @@
 package com.example.price_comparator.utils;
 
-import lombok.AllArgsConstructor;
-
 import java.time.LocalDate;
 
 public class FileNameExtractor {
