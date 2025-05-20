@@ -14,7 +14,7 @@ public class FileNameExtractor {
     }
 
     public static StoreAndDate extract(String filename){
-        String[] data = filename.split("_");
+        String[] data = filename.split("[_.]");
         if(data.length < 2) {
             throw new IllegalArgumentException("Filename must be in format 'Store_YYYY-MM-DD.csv' or 'Store_Discounts_YYYY-MM-DD.csv");
         }

@@ -2,7 +2,7 @@ package com.example.price_comparator.dto;
 
 import java.time.LocalDate;
 
-public class DiscountsEntry {
+public class DiscountEntry {
     private String productId;
     private String productName;
     private String brand;

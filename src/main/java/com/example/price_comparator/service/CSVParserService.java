@@ -45,6 +45,8 @@ public class CSVParserService {
     }
 
     public List<PriceEntry> parseCSV(Path filePath) throws Exception {
+        System.out.println("Parsing: " + filePath);
+
         try (Reader reader = Files.newBufferedReader(filePath)) {
             // Extract store and date from filename
             FileNameExtractor.StoreAndDate storeAndDate = FileNameExtractor.extract(filePath.getFileName().toString());
