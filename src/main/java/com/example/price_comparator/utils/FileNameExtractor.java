@@ -14,12 +14,18 @@ public class FileNameExtractor {
     }
 
     public static StoreAndDate extract(String filename){
-        String[] data = filename.split("[_.]");
-        if(data.length < 3) {
-            throw new IllegalArgumentException("Filename must be in format 'Store_YYYY-MM-DD.csv' or 'Store_Discounts_YYYY-MM-DD.csv");
-        } else if(data.length == 3){
-            return new StoreAndDate(data[0], LocalDate.parse(data[1]));
+        // Remove .csv extension
+        String name = filename.replace(".csv", "");
+        String[] parts = name.split("_");
+
+        if(parts.length == 3 && "discounts".equals(parts[1])){
+            // Handle discount file format: <store>_discounts_<entry-date>
+            return new StoreAndDate(parts[0], LocalDate.parse(parts[2]));
+        } else if(parts.length == 2) {
+            // Handle file format: <store>_<date>
+            return new StoreAndDate(parts[0], LocalDate.parse(parts[1]));
+        } else {
+            throw new IllegalArgumentException("Invalid filename format for " + filename);
         }
-        return new StoreAndDate(data[0], LocalDate.parse(data[2]));
     }
 }

@@ -1,6 +1,8 @@
 package com.example.price_comparator.service;
 
-import com.example.price_comparator.dto.PriceEntry;
+import com.example.price_comparator.dto.csv.BaseCSVEntry;
+import com.example.price_comparator.dto.csv.DiscountCSVEntry;
+import com.example.price_comparator.dto.csv.PriceCSVEntry;
 import com.example.price_comparator.utils.FileNameExtractor;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -26,42 +28,50 @@ public class CSVParserService {
         this.resourceLoader = resourceLoader;
     }
 
-    public List<PriceEntry> parseAllCSVFiles() throws IOException {
-        List<PriceEntry> allEntries = new ArrayList<>();
-        Resource resource = resourceLoader.getResource("classpath:data/prices");
-        Path pricesDir = Paths.get(resource.getURI());
+    public List<PriceCSVEntry> parseAllPriceCSVFiles() throws IOException {
+        return parseCSVFilesFromDirectory("classpath:data/prices", PriceCSVEntry.class);
+    }
 
-        try (Stream<Path> paths = Files.list(pricesDir)){
-            paths.forEach(csvFile -> {
-                try {
-                    allEntries.addAll(parseCSV(csvFile));
-                } catch (Exception e){
-                    throw new RuntimeException("Failed to parse " + csvFile, e);
-                }
-            });
+    public List<DiscountCSVEntry> parseAllDiscountCSVFiles() throws IOException {
+        return parseCSVFilesFromDirectory("classpath:data/discounts", DiscountCSVEntry.class);
+    }
+
+    private <T extends BaseCSVEntry> List<T> parseCSVFilesFromDirectory(String directoryPath, Class<T> entryClass) throws IOException {
+        List<T> allEntries = new ArrayList<>();
+        Resource resource = resourceLoader.getResource(directoryPath);
+        Path dir = Paths.get(resource.getURI());
+
+        try (Stream<Path> paths = Files.list(dir)) {
+            paths.filter(path -> path.toString().endsWith(".csv"))
+                    .forEach(csvFile -> {
+                        try {
+                            allEntries.addAll(parseCSVFile(csvFile, entryClass));
+                        } catch (Exception e) {
+                            throw new RuntimeException("Failed to parse " + csvFile, e);
+                        }
+                    });
         }
 
         return allEntries;
     }
 
-    public List<PriceEntry> parseCSV(Path filePath) throws Exception {
-        System.out.println("Parsing: " + filePath);
+    private <T extends BaseCSVEntry> List<T> parseCSVFile(Path filePath, Class<T> entryClass) throws Exception {
+        System.out.println("Parsing price file " + filePath);
 
         try (Reader reader = Files.newBufferedReader(filePath)) {
             // Extract store and date from filename
             FileNameExtractor.StoreAndDate storeAndDate = FileNameExtractor.extract(filePath.getFileName().toString());
 
             // Configure CSV parsing
-            HeaderColumnNameMappingStrategy<PriceEntry> strategy = new HeaderColumnNameMappingStrategy<>();
-            strategy.setType(PriceEntry.class);
-
-            CsvToBean<PriceEntry> csvToBean = new CsvToBeanBuilder<PriceEntry>(reader)
+            HeaderColumnNameMappingStrategy<T> strategy = new HeaderColumnNameMappingStrategy<>();
+            strategy.setType(entryClass);
+            CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader)
                     .withMappingStrategy(strategy)
                     .withSeparator(';')
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();
 
-            List<PriceEntry> entries = csvToBean.parse();
+            List<T> entries = csvToBean.parse();
 
             // Set store and date for all entries
             entries.forEach(entry -> {

@@ -1,6 +1,6 @@
 package com.example.price_comparator;
 
-import com.example.price_comparator.dto.PriceEntry;
+import com.example.price_comparator.dto.csv.DiscountCSVEntry;
 import com.example.price_comparator.service.CSVParserService;
 import com.example.price_comparator.service.DBService;
 import org.springframework.boot.CommandLineRunner;
@@ -23,9 +23,15 @@ public class PriceComparatorApiApplication {
 	CommandLineRunner loadData(CSVParserService csvParserService, DBService dbService){
 		return args -> {
 			try {
-				List<PriceEntry> entries = csvParserService.parseAllCSVFiles();
-				dbService.saveAllPriceEntries(entries);
-				System.out.println("[SUCCESS] Loaded " + entries.size() + " price entries.");
+				// Load prices
+//				List<PriceCSVEntry> priceEntries = csvParserService.parseAllPriceCSVFiles();
+//				dbService.saveAllEntries(priceEntries);
+//				System.out.println("[SUCCESS] Loaded " + priceEntries.size() + " price entries.");
+
+				// Load discounts
+				List<DiscountCSVEntry> discountEntries = csvParserService.parseAllDiscountCSVFiles();
+				dbService.saveAllEntries(discountEntries);
+				System.out.println("[SUCCESS] Loaded " + discountEntries.size() + " discount entries.");
 			} catch (Exception e){
 				System.err.println("[ERROR] Failed to load data: " + e.getMessage());
 			}

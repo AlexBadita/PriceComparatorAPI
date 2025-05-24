@@ -1,15 +1,33 @@
 package com.example.price_comparator.service;
 
+import com.example.price_comparator.dto.DiscountDTO;
 import com.example.price_comparator.model.Discount;
+import com.example.price_comparator.repository.DiscountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DiscountService {
+    private final DiscountRepository discountRepository;
+    private final DiscountMapperService discountMapper;
+
+    // Get all discounts
+    public List<DiscountDTO> getAllDiscounts() {
+        return discountRepository.findAll().stream()
+                .map(discountMapper::toDiscountDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Helper functions
+
     public boolean isActive(Discount discount, LocalDate selectedDate){
         LocalDate date = Optional.ofNullable(selectedDate).orElse(LocalDate.now());
 

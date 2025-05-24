@@ -1,13 +1,12 @@
-package com.example.price_comparator.dto;
+package com.example.price_comparator.dto.csv;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
-public class PriceEntry {
+public class PriceCSVEntry extends BaseCSVEntry {
     @CsvBindByName(column = "product_id")
     private String productId;
 
@@ -31,7 +30,4 @@ public class PriceEntry {
 
     @CsvBindByName(column = "currency")
     private String currency;
-
-    private LocalDate entryDate;
-    private String store;
 }

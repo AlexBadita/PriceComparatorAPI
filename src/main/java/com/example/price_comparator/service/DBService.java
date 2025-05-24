@@ -1,6 +1,8 @@
 package com.example.price_comparator.service;
 
-import com.example.price_comparator.dto.PriceEntry;
+import com.example.price_comparator.dto.csv.BaseCSVEntry;
+import com.example.price_comparator.dto.csv.DiscountCSVEntry;
+import com.example.price_comparator.dto.csv.PriceCSVEntry;
 import com.example.price_comparator.model.*;
 import com.example.price_comparator.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +18,21 @@ public class DBService {
     @Autowired private BrandRepository brandRepository;
     @Autowired private StoreRepository storeRepository;
     @Autowired private PriceRepository priceRepository;
+    @Autowired private DiscountRepository discountRepository;
 
     @Transactional
-    public void saveAllPriceEntries(List<PriceEntry> entries){
-        entries.forEach(this::savePriceEntry);
+    public void saveAllEntries(List<? extends BaseCSVEntry> entries) {
+        entries.forEach(entry -> {
+            if(entry instanceof  PriceCSVEntry) {
+                savePriceEntry((PriceCSVEntry) entry);
+            } else if(entry instanceof DiscountCSVEntry) {
+                saveDiscountEntry((DiscountCSVEntry) entry);
+            }
+        });
     }
 
     @Transactional
-    public void savePriceEntry(PriceEntry entry){
+    public void savePriceEntry(PriceCSVEntry entry){
         // Find or create Category
         Category category = categoryRepository.findByName(entry.getProductCategory())
                 .orElseGet(() -> categoryRepository.save(new Category(entry.getProductCategory())));
@@ -57,5 +66,26 @@ public class DBService {
         price.setCurrency(entry.getCurrency());
         price.setEntryDate(entry.getEntryDate());
         priceRepository.save(price);
+    }
+
+    @Transactional
+    public void saveDiscountEntry(DiscountCSVEntry entry){
+        // Find or create Store
+        Store store = storeRepository.findByName(entry.getStore())
+                .orElseGet(() -> storeRepository.save(new Store(entry.getStore())));
+
+        // Product must exist
+        Product product = productRepository.findById(entry.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found for discount: " + entry.getProductId()));
+
+        // Create and save Discount
+        Discount discount = new Discount();
+        discount.setProduct(product);
+        discount.setStore(store);
+        discount.setPercentage(entry.getPercentage());
+        discount.setFromDate(entry.getFromDate());
+        discount.setToDate(entry.getToDate());
+        discount.setEntryDate(entry.getEntryDate());
+        discountRepository.save(discount);
     }
 }

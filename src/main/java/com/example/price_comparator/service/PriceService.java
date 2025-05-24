@@ -26,7 +26,7 @@ public class PriceService {
     private DiscountService discountService;
 
     public BigDecimal getCurrentPrice(Price price){
-
+        return price.getPrice();
     }
 
     public Store findStoreWithLowestPrice(Product product){
