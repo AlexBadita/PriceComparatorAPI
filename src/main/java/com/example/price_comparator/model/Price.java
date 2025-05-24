@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "prices")
@@ -34,4 +36,7 @@ public class Price {
 
     @Column(name = "entry_date", nullable = false)
     private LocalDate entryDate;
+
+    @OneToMany(mappedBy = "price", cascade = CascadeType.ALL)
+    private List<Discount> discounts = new ArrayList<>();
 }
