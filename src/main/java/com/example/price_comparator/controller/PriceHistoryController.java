@@ -2,7 +2,6 @@ package com.example.price_comparator.controller;
 
 import com.example.price_comparator.dto.price_history.PriceHistoryDTO;
 import com.example.price_comparator.dto.price_history.PriceHistoryFilter;
-import com.example.price_comparator.dto.price_history.PriceHistoryPointDTO;
 import com.example.price_comparator.service.PriceHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * REST controller for managing price histogram for a product.
+ */
 @RestController
 @RequestMapping("/api/price-history")
 @RequiredArgsConstructor
@@ -56,15 +58,29 @@ public class PriceHistoryController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        PriceHistoryFilter filter = new PriceHistoryFilter();
-        filter.setProductName(productName);
-        filter.setStoreName(storeName);
-        filter.setCategoryName(categoryName);
-        filter.setBrandName(brandName);
-        filter.setStartDate(startDate);
-        filter.setEndDate(endDate);
+        if (productName == null || productName.isBlank()) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request
+        }
 
-       List<PriceHistoryDTO> history = priceHistoryService.getPriceHistory(filter);
-       return ResponseEntity.ok(history);
+        try{
+            PriceHistoryFilter filter = new PriceHistoryFilter();
+            filter.setProductName(productName);
+            filter.setStoreName(storeName);
+            filter.setCategoryName(categoryName);
+            filter.setBrandName(brandName);
+            filter.setStartDate(startDate);
+            filter.setEndDate(endDate);
+
+            List<PriceHistoryDTO> history = priceHistoryService.getPriceHistory(filter);
+            if (history == null || history.isEmpty()) {
+                return ResponseEntity.notFound().build(); // 404 Not Found
+            }
+
+            return ResponseEntity.ok(history);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null); // 400 Bad Request
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build(); // 500 Internal Server Error
+        }
     }
 }

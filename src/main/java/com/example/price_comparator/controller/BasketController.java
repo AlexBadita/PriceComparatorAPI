@@ -41,9 +41,16 @@ public class BasketController {
             @Parameter(description = "List of product IDs to optimize")
             @RequestBody  List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().build(); // 400
         }
-        List<StoreBasketDTO> optimizedBasket = basketService.optimizeBasket(productIds);
-        return ResponseEntity.ok(optimizedBasket);
+
+        try {
+            List<StoreBasketDTO> optimizedBasket = basketService.optimizeBasket(productIds);
+            return ResponseEntity.ok(optimizedBasket); // 200
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(null); // 400
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().build(); // 500
+        }
     }
 }

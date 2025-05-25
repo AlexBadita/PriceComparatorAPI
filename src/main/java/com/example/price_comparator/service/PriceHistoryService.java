@@ -19,6 +19,15 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service class responsible for generating historical price timelines for products.
+ * It provides functionality to retrieve the pricing and discount history of a given product
+ * across different stores, supporting various filtering criteria such as store, brand, category,
+ * and date range.
+ *
+ * The service compiles timelines showing original and final (discounted) prices over time,
+ * broken down per store.
+ */
 @Service
 @RequiredArgsConstructor
 public class PriceHistoryService {
@@ -27,6 +36,16 @@ public class PriceHistoryService {
     private final DiscountRepository discountRepository;
     private final PriceHelpers priceHelpers;
 
+    /**
+     * Retrieves the historical price data for a product, optionally filtered by store, category, brand,
+     * and constrained within a specific date range. Also includes any applicable discounts during those periods.
+     *
+     * @param filter an object containing filter criteria including product name (required),
+     *               and optionally store name, category name, brand name, start date, and end date
+     * @return a list of PriceHistoryDTO representing the price timeline of each store for the given product,
+     *         or null if no prices match the filter
+     * @throws IllegalArgumentException if the product name is not provided in the filter
+     */
     public List<PriceHistoryDTO> getPriceHistory(PriceHistoryFilter filter) {
         // Validate product ID
         if(filter.getProductName() == null) {

@@ -16,10 +16,19 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-
+/**
+ * Service responsible for generating product recommendations based on pricing.
+ * It identifies cheaper alternatives within the same category as a given product,
+ * evaluates current prices with applicable discounts, and optionally normalizes prices
+ * by converting units for accurate comparisons.
+ *
+ * Key features:
+ * - Filters out the original product and compares only relevant alternatives.
+ * - Applies active discounts for accurate price evaluation.
+ * - Supports unit conversion for price-per-unit comparison.
+ */
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
@@ -38,14 +47,14 @@ public class RecommendationService {
     public List<ProductRecommendationDTO> getCheaperAlternatives(String productId, LocalDate date, String targetUnit) {
         LocalDate evaluationDate = Optional.ofNullable(date).orElse(LocalDate.now());
 
-        // 1. Get the original product
+        // Get the original product
         Product originalProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
 
-        // 2. Get its category
+        // Get its category
         Category category = originalProduct.getCategory();
 
-        // 3. Find products in the same category with compatible units
+        // Find products in the same category with compatible units
         List<Product> sameCategoryProducts = productRepository.findByCategory(category);
 
         // Filter products with units in the same category as the original
@@ -55,7 +64,7 @@ public class RecommendationService {
                 .filter(p -> p.getPackageUnit().equals(originalProduct.getPackageUnit()))
                 .toList();
 
-        // 4. Compute price per unit for original product (with discounts if any)
+        // Compute price per unit for original product (with discounts if any)
         BigDecimal originalPricePerUnit = calculateProductPricePerUnit(originalProduct, evaluationDate, targetUnit);
 
         if (originalPricePerUnit == null) {
@@ -64,12 +73,12 @@ public class RecommendationService {
 
         List<ProductRecommendationDTO> recommendations = new ArrayList<>();
 
-        // 5. Compute price per unit for other products and find cheaper ones
+        // Compute price per unit for other products and find cheaper ones
         for (Product alternativeProduct : sameCategoryProducts) {
             BigDecimal alternativePricePerUnit = calculateProductPricePerUnit(alternativeProduct, evaluationDate, targetUnit);
 
             if (alternativePricePerUnit != null && alternativePricePerUnit.compareTo(originalPricePerUnit) < 0) {
-                // 6. This is a cheaper alternative
+                // This is a cheaper alternative
                 BigDecimal savingsPercentage = originalPricePerUnit.subtract(alternativePricePerUnit)
                         .divide(originalPricePerUnit, 4, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100))

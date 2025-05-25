@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service class responsible for mapping Product entities to their corresponding DTOs.
+ * It handles conversion of nested properties such as category, brand, and pricing history grouped by store.
+ */
 @Service
 public class ProductMapperService {
     public ProductDTO toProductDTO(Product product) {

@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Service class responsible for handling business logic related to discounts.
+ * It provides methods for retrieving all discounts, active discounts, discounts by date or store,
+ * the highest discounts per product, and newly added discounts.
+ */
 @Service
 @RequiredArgsConstructor
 public class DiscountService {
@@ -23,21 +28,29 @@ public class DiscountService {
     private final DiscountMapperService discountMapper;
     private final PriceHelpers priceHelpers;
 
-    // Get all discounts
+    /**
+     * Retrieves all discounts from the database.
+     *
+     * @return a list of all DiscountDTOs
+     */
     public List<DiscountDTO> getAllDiscounts() {
         return discountRepository.findAll().stream()
                 .map(discountMapper::toDiscountDTO)
                 .collect(Collectors.toList());
     }
 
-    // Get all active discounts
+    /**
+     * Retrieves all discounts that are currently active on a given date.
+     *
+     * @param date the date to check for active discounts
+     * @return a list of DiscountDTOs that are active on the specified date
+     */
     public List<DiscountDTO> getActiveDiscounts(LocalDate date) {
         return discountRepository.findAll().stream()
                 .filter(d -> priceHelpers.isDiscountActive(d, date))
                 .map(discountMapper::toDiscountDTO)
                 .collect(Collectors.toList());
     }
-
 
     /**
      * Retrieves all discounts with the specified entry date.
@@ -63,6 +76,12 @@ public class DiscountService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the products with the highest currently active discount.
+     * For each product, the discount with the maximum percentage is selected.
+     *
+     * @return list of DiscountDTOs representing the highest current discount per product
+     */
     public List<DiscountDTO> getProductsWithHighestCurrentDiscount() {
         List<Discount> activeDiscounts = discountRepository.findActiveDiscounts(today);
 

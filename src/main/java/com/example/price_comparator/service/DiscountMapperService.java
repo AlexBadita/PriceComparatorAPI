@@ -8,6 +8,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class responsible for mapping Discount model entities
+ * to their corresponding DTO representations.
+ */
 @Service
 public class DiscountMapperService {
     public DiscountDTO toDiscountDTO(Discount discount){

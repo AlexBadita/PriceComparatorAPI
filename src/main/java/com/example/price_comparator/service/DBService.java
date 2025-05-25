@@ -5,7 +5,6 @@ import com.example.price_comparator.dto.csv.DiscountCSVEntry;
 import com.example.price_comparator.dto.csv.PriceCSVEntry;
 import com.example.price_comparator.model.*;
 import com.example.price_comparator.model.enums.Currency;
-import com.example.price_comparator.model.enums.Unit;
 import com.example.price_comparator.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

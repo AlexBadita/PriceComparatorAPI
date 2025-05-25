@@ -7,14 +7,20 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * REST controller for managing product-related operations.
+ * Provides endpoints for retrieving products data.
+ */
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -33,8 +39,12 @@ public class ProductController {
     )
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        List<ProductDTO> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+        try {
+            List<ProductDTO> products = productService.getAllProducts();
+            return ResponseEntity.ok(products);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve products", ex);
+        }
     }
 
     @Operation(
@@ -50,7 +60,13 @@ public class ProductController {
     public ResponseEntity<ProductDTO> getProductById(
             @Parameter(description = "ID of the product to be retrieved")
             @PathVariable String id) {
-        ProductDTO product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+        try {
+            ProductDTO product = productService.getProductById(id);
+            return ResponseEntity.ok(product);
+        } catch (com.example.price_comparator.exception.ResourceNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve product", ex);
+        }
     }
 }

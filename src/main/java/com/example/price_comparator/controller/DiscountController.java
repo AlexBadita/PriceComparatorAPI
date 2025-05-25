@@ -1,8 +1,6 @@
 package com.example.price_comparator.controller;
 
 import com.example.price_comparator.dto.DiscountDTO;
-import com.example.price_comparator.dto.DiscountProductDTO;
-import com.example.price_comparator.dto.ProductDTO;
 import com.example.price_comparator.service.DiscountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

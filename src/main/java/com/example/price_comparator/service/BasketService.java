@@ -13,6 +13,7 @@ import com.example.price_comparator.repository.StoreRepository;
 import com.example.price_comparator.utils.PriceHelpers;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,15 +21,15 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Service responsible for optimizing a shopping basket by finding the best prices
  * (including discounts) for a given list of product IDs across all available stores.
  */
+@Service
+@RequiredArgsConstructor
 public class BasketService {
 
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(BasketService.class);
+    private static final Logger logger = LoggerFactory.getLogger(BasketService.class);
 
     private final ProductRepository productRepository;
     private final DiscountRepository discountRepository;
