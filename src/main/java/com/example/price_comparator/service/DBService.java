@@ -4,6 +4,8 @@ import com.example.price_comparator.dto.csv.BaseCSVEntry;
 import com.example.price_comparator.dto.csv.DiscountCSVEntry;
 import com.example.price_comparator.dto.csv.PriceCSVEntry;
 import com.example.price_comparator.model.*;
+import com.example.price_comparator.model.enums.Currency;
+import com.example.price_comparator.model.enums.Unit;
 import com.example.price_comparator.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Service responsible for saving parsed CSV data entries to the database.
+ * Handles creation or reuse of related entities like products, categories,
+ * brands, and stores before saving price or discount data.
+ */
 @Service
 public class DBService {
     @Autowired private ProductRepository productRepository;
@@ -20,6 +27,12 @@ public class DBService {
     @Autowired private PriceRepository priceRepository;
     @Autowired private DiscountRepository discountRepository;
 
+    /**
+     * Saves a list of parsed CSV entries (prices or discounts) into the database.
+     * Delegates each entry to the appropriate saving logic based on its type.
+     *
+     * @param entries list of parsed CSV entries
+     */
     @Transactional
     public void saveAllEntries(List<? extends BaseCSVEntry> entries) {
         entries.forEach(entry -> {
@@ -31,6 +44,12 @@ public class DBService {
         });
     }
 
+    /**
+     * Saves a single PriceCSVEntry into the database, creating or reusing related
+     * entities such as Product, Category, Brand, and Store as needed.
+     *
+     * @param entry the price entry to persist
+     */
     @Transactional
     public void savePriceEntry(PriceCSVEntry entry){
         // Find or create Category
@@ -63,11 +82,22 @@ public class DBService {
         price.setProduct(product);
         price.setStore(store);
         price.setPrice(entry.getPrice());
-        price.setCurrency(entry.getCurrency());
+        try {
+            price.setCurrency(Currency.valueOf(entry.getCurrency().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid currency format: " + entry.getCurrency());
+        }
         price.setEntryDate(entry.getEntryDate());
         priceRepository.save(price);
     }
 
+    /**
+     * Saves a single DiscountCSVEntry into the database.
+     * Assumes the associated Product already exists; will create the Store if needed.
+     *
+     * @param entry the discount entry to persist
+     * @throws RuntimeException if the referenced Product does not exist
+     */
     @Transactional
     public void saveDiscountEntry(DiscountCSVEntry entry){
         // Find or create Store

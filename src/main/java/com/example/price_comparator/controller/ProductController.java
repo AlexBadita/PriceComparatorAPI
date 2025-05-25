@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Product Management", description = "Endpoints for managing products")
 public class ProductController {
+
     private final ProductService productService;
 
     @Operation(

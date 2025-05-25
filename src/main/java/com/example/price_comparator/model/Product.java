@@ -1,5 +1,6 @@
 package com.example.price_comparator.model;
 
+import com.example.price_comparator.model.enums.Unit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +34,7 @@ public class Product {
    @Column(name = "package_quantity", nullable = false)
    private BigDecimal packageQuantity;
 
+//   @Enumerated(EnumType.STRING)
    @Column(name = "package_unit", nullable = false, length = 20)
    private String packageUnit;
 

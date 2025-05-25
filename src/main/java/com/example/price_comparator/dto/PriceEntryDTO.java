@@ -1,5 +1,6 @@
 package com.example.price_comparator.dto;
 
+import com.example.price_comparator.model.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class PriceEntryDTO {
     private BigDecimal price;
-    private String currency;
+    private Currency currency;
     private LocalDate entryDate;
 }

@@ -1,5 +1,6 @@
 package com.example.price_comparator.dto;
 
+import com.example.price_comparator.model.enums.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

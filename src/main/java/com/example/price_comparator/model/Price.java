@@ -1,5 +1,6 @@
 package com.example.price_comparator.model;
 
+import com.example.price_comparator.model.enums.Currency;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,8 +30,9 @@ public class Price {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    private String currency = "RON"; // Default value "RON"
+    private Currency currency = Currency.RON; // Default value "RON"
 
     @Column(name = "entry_date", nullable = false)
     private LocalDate entryDate;

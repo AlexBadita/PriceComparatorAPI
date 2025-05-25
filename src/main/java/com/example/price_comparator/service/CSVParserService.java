@@ -20,22 +20,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Service for parsing CSV files from the configured directories and mapping them
+ * to DTOs (PriceCSVEntry and DiscountCSVEntry). Automatically assigns store name
+ * and entry date based on the filename.
+ */
 @Service
 public class CSVParserService {
+
     private final ResourceLoader resourceLoader;
 
     public CSVParserService(ResourceLoader resourceLoader){
         this.resourceLoader = resourceLoader;
     }
 
+    /**
+     * Parses all price CSV files from the data/prices directory and returns the parsed entries.
+     *
+     * @return list of parsed PriceCSVEntry objects
+     * @throws IOException if an I/O error occurs during file access
+     */
     public List<PriceCSVEntry> parseAllPriceCSVFiles() throws IOException {
         return parseCSVFilesFromDirectory("classpath:data/prices", PriceCSVEntry.class);
     }
 
+    /**
+     * Parses all discount CSV files from the data/discounts directory and returns the parsed entries.
+     *
+     * @return list of parsed DiscountCSVEntry objects
+     * @throws IOException if an I/O error occurs during file access
+     */
     public List<DiscountCSVEntry> parseAllDiscountCSVFiles() throws IOException {
         return parseCSVFilesFromDirectory("classpath:data/discounts", DiscountCSVEntry.class);
     }
 
+    /**
+     * Parses all CSV files from the given directory and maps them to the specified DTO class.
+     *
+     * @param directoryPath the classpath directory containing CSV files
+     * @param entryClass the target class to map each CSV entry to
+     * @return list of parsed DTO entries
+     * @param <T> type parameter extending BaseCSVEntry
+     * @throws IOException if an I/O error occurs while reading files
+     */
     private <T extends BaseCSVEntry> List<T> parseCSVFilesFromDirectory(String directoryPath, Class<T> entryClass) throws IOException {
         List<T> allEntries = new ArrayList<>();
         Resource resource = resourceLoader.getResource(directoryPath);
@@ -55,8 +82,18 @@ public class CSVParserService {
         return allEntries;
     }
 
+    /**
+     * Parses a single CSV file and maps its rows to the specified DTO class.
+     * Automatically sets the store and entry date from the filename.
+     *
+     * @param filePath the path to the CSV file
+     * @param entryClass the target class to map each row to
+     * @return list of parsed entries with metadata from the filename
+     * @param <T> type parameter extending BaseCSVEntry
+     * @throws Exception if parsing fails
+     */
     private <T extends BaseCSVEntry> List<T> parseCSVFile(Path filePath, Class<T> entryClass) throws Exception {
-        System.out.println("Parsing price file " + filePath);
+        System.out.println("Parsing CSV file " + filePath);
 
         try (Reader reader = Files.newBufferedReader(filePath)) {
             // Extract store and date from filename
